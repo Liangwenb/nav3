@@ -2,9 +2,21 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-
+    id("maven-publish")
 }
 
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId = 'com.github.Liangwenb'
+                artifactId = 'nav'
+                from components.release
+            }
+        }
+    }
+}
 android {
     namespace 'com.liangwenb.nav'
     compileSdk {
@@ -55,7 +67,7 @@ dependencies {
     api libs.androidx.navigation3.runtime
     api libs.androidx.navigation3.ui
     api libs.androidx.lifecycle.viewmodel.navigation3
-    
+
 
 
 }
