@@ -1,13 +1,15 @@
 plugins {
     id 'java-library'
     alias(libs.plugins.jetbrains.kotlin.jvm)
+    id 'maven-publish'
+
 }
 
 publishing {
     publications {
         release(MavenPublication) {
             groupId = 'com.github.Liangwenb'
-            artifactId = 'route_processor'
+            artifactId = 'route_annotation'
             from components.java
         }
     }
