@@ -5,7 +5,9 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.jetbrains.kotlin.serialization)
 }
-
+ksp {
+    arg("MODULE_NAME", project.name)
+}
 android {
     namespace 'com.liangwenb.sample'
     compileSdk {

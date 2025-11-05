@@ -75,8 +75,11 @@ class TestKspSymbolProcessor(private val environment: SymbolProcessorEnvironment
             .map { it.packageName.asString() }
             .distinct()
             .maxByOrNull { it.length }
+            ?.split(".")
+            ?.take(2)       // 只取前两级
+            ?.joinToString(".")
 
-        val fileBuilder = FileSpec.builder("$currentPkg.generated", "GeneratedEntryProvider")
+        val fileBuilder = FileSpec.builder("$currentPkg.$moduleName.generated", "GeneratedEntryProvider")
 
         fileBuilder.addImport("androidx.navigation3.runtime","entryProvider")
         fileBuilder.addImport("com.liangwenb.nav","keyViewModel")
