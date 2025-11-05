@@ -22,7 +22,12 @@ android {
     compileSdk {
         version = release(36)
     }
-
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()   // 可选：生成 sources.jar
+            withJavadocJar()   // 可选：生成 javadoc.jar
+        }
+    }
     defaultConfig {
         minSdk 26
 
