@@ -1,4 +1,4 @@
-# nav3
+# Compose navigation3 简单封装。 通过注解设置路由
 
 ### 插件设置
 
@@ -47,7 +47,7 @@
 
 ### 新建路由
 
-新建Compose界面  在函数上添加注解
+新建Compose界面 在函数上添加注解
 
     @Route(key = XXX::class)
     @Composable
@@ -57,7 +57,8 @@
         }
      }
 
-在data 模块中 nav路径下 新增一个 XXX 的类,需要被 `@Serializable`注解 和 继承 `NavKey` ，如果跳转需要返回值则继承 `ResultNavKey` ，例如：
+在data 模块中 nav路径下 新增一个 XXX 的类,需要被 `@Serializable`注解 和 继承 `NavKey` ，如果跳转需要返回值则继承
+`ResultNavKey` ，例如：
 
     @Serializable
     data object XXX : NavKey
@@ -96,9 +97,7 @@
 
 ### ViewModel
 
-
 **==逻辑和数据都保存在viewModel里面，界面的函数里面只负责显示UI==**
-
 
 在不需要传递参数的情况下继承`viewModel`
 
@@ -113,7 +112,6 @@
         
             }
     }
-
 
 在需要传递路由的情况需要继承`KeyViewModel`
 
