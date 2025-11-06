@@ -6,9 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.rizzmeup.route_annotation.Route
 
-@Route(Page.Key::class)
+@Route(Page.Result::class)
 @Composable
-fun KeyPage(key: Page.Result) {
+fun ResultPage(key: Page.Result) {
     Column(Modifier.fillMaxSize()) {
 
 
