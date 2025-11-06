@@ -92,7 +92,7 @@
 
 指定关闭界面
 
-> `NavBackStackUtils.finish(XXX)`
+    NavBackStackUtils.finish(XXX)
 
 ### ViewModel
 
