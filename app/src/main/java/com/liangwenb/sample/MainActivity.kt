@@ -7,9 +7,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
@@ -85,9 +92,20 @@ class MainActivity : ComponentActivity() {
 @Route(Home::class)
 @Composable
 fun Home() {
-    Column(Modifier.fillMaxSize()) {
+    Column(
+        Modifier
+            .systemBarsPadding()
+            .fillMaxSize()
+    ) {
 
-
+        Text(
+            "跳转到把Key传递到Page中", modifier = Modifier
+                .clickable {
+                    NavBackStackUtils.go(Page.Key())
+                }
+                .fillMaxWidth()
+                .height(56.dp)
+                .wrapContentSize())
     }
 }
 

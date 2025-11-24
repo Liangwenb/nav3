@@ -5,6 +5,9 @@ import android.content.Context
 import android.util.Log
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.serializer
 import kotlin.collections.get
 
 
@@ -22,10 +25,23 @@ private fun NavBackStack<NavKey>.finish(key: NavKey?) {
 
 fun <T : NavKey> NavBackStack<T>.go(navKey: T) {
     runCatching {
-        add(navKey)
+        if(isSerializable(navKey)){
+            add(navKey)
+        }
     }.onFailure { it.printStackTrace() }
 }
-
+@OptIn(InternalSerializationApi::class)
+fun isSerializable(navKey: Any): Boolean {
+    return try {
+        val kClass = navKey::class
+        // 尝试获取序列化器
+        kClass.serializer()
+        true
+    } catch (e: SerializationException) {
+        e.printStackTrace()
+        false
+    }
+}
 object NavBackStackUtils {
 
     lateinit var mianClass: Class<out Activity>

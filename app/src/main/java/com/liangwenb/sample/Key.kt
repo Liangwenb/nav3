@@ -14,7 +14,7 @@ data object Page {
      * 把key传递到 Page 中
      */
     @Serializable
-    data object Key : NavKey
+    data class Key(val message: String = "把key传递到 Page 中") : NavKey
 
     /**
      * 把key传递到 viewModel 中

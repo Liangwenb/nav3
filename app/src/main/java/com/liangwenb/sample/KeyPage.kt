@@ -2,6 +2,8 @@ package com.liangwenb.sample
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.rizzmeup.route_annotation.Route
@@ -9,8 +11,7 @@ import com.rizzmeup.route_annotation.Route
 @Route(Page.Key::class)
 @Composable
 fun KeyPage(key: Page.Key) {
-    Column(Modifier.fillMaxSize()) {
-
-
-    }
+    Text(key.message, modifier = Modifier
+        .fillMaxSize()
+        .wrapContentSize())
 }
