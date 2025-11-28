@@ -25,11 +25,12 @@ private fun NavBackStack<NavKey>.finish(key: NavKey?) {
 
 fun <T : NavKey> NavBackStack<T>.go(navKey: T) {
     runCatching {
-        if(isSerializable(navKey)){
+        if (isSerializable(navKey)) {
             add(navKey)
         }
     }.onFailure { it.printStackTrace() }
 }
+
 @OptIn(InternalSerializationApi::class)
 fun isSerializable(navKey: Any): Boolean {
     return try {
@@ -42,6 +43,7 @@ fun isSerializable(navKey: Any): Boolean {
         false
     }
 }
+
 object NavBackStackUtils {
 
     lateinit var mianClass: Class<out Activity>
@@ -116,6 +118,10 @@ object NavBackStackUtils {
         navKey?.sendResult(result)
         backStack?.finish(navKey)
     }
+
+    fun getBackStack(context: Context? = null): NavBackStack<NavKey>? = runCatching {
+        return@runCatching routerMap[context] ?: routerMap.values.lastOrNull()
+    }.getOrNull()
 
     fun <T : NavKey> getTopKey(context: Context? = null): T? = runCatching {
         val backStack = routerMap[context] ?: routerMap.values.lastOrNull()
