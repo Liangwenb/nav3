@@ -123,9 +123,9 @@ object NavBackStackUtils {
         return@runCatching routerMap[context] ?: routerMap.values.lastOrNull()
     }.getOrNull()
 
-    fun <T : NavKey> getTopKey(context: Context? = null): T? = runCatching {
+    fun  getTopKey(context: Context? = null): NavKey? = runCatching {
         val backStack = routerMap[context] ?: routerMap.values.lastOrNull()
-        backStack?.lastOrNull() as T?
+        backStack?.lastOrNull()
     }.getOrNull()
 
 }
