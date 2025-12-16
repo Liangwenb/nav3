@@ -101,8 +101,8 @@ object NavBackStackUtils {
                 navKey.resultCallback = {
                     suspendCancellableCoroutine.resume(it)
                 }
+                go(navKey, context)
             }
-        go(navKey, context)
         return cancellableCoroutine
     }
 
