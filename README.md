@@ -1,4 +1,4 @@
-# Compose navigation3 简单封装。 通过注解设置路由
+# Compose navigation3 简单封装。 通过注解设置路由 [![](https://jitpack.io/v/Liangwenb/nav3.svg)](https://jitpack.io/#Liangwenb/nav3)
 
 ### 插件设置
 
