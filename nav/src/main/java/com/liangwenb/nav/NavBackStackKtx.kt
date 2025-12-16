@@ -5,10 +5,12 @@ import android.content.Context
 import android.util.Log
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.serializer
 import kotlin.collections.get
+import kotlin.coroutines.resume
 
 
 private fun NavBackStack<NavKey>.back() {
@@ -90,6 +92,20 @@ object NavBackStackUtils {
         go(navKey, context)
     }
 
+    suspend fun <T> goResult(
+        navKey: ResultNavKey<T>,
+        context: Context? = null,
+    ): T? {
+        val cancellableCoroutine =
+            suspendCancellableCoroutine { suspendCancellableCoroutine ->
+                navKey.resultCallback = {
+                    suspendCancellableCoroutine.resume(it)
+                }
+            }
+        go(navKey, context)
+        return cancellableCoroutine
+    }
+
     fun back(context: Context? = null) {
         val backStack = routerMap[context] ?: routerMap.values.lastOrNull()
         backStack?.back()
@@ -123,7 +139,7 @@ object NavBackStackUtils {
         return@runCatching routerMap[context] ?: routerMap.values.lastOrNull()
     }.getOrNull()
 
-    fun  getTopKey(context: Context? = null): NavKey? = runCatching {
+    fun getTopKey(context: Context? = null): NavKey? = runCatching {
         val backStack = routerMap[context] ?: routerMap.values.lastOrNull()
         backStack?.lastOrNull()
     }.getOrNull()
