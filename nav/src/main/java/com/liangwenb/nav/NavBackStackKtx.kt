@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationException
@@ -92,6 +93,7 @@ object NavBackStackUtils {
         go(navKey, context)
     }
 
+    @OptIn(InternalCoroutinesApi::class)
     suspend fun <T> goResult(
         navKey: ResultNavKey<T>,
         context: Context? = null,
@@ -99,7 +101,10 @@ object NavBackStackUtils {
         val cancellableCoroutine =
             suspendCancellableCoroutine { suspendCancellableCoroutine ->
                 navKey.resultCallback = {
-                    suspendCancellableCoroutine.resume(it)
+                    val token = suspendCancellableCoroutine.tryResume(it)
+                    if (token != null) {
+                        suspendCancellableCoroutine.completeResume(token)
+                    }
                 }
                 go(navKey, context)
             }

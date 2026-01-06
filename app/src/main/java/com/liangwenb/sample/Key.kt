@@ -36,12 +36,12 @@ data object Dialog : NavKey {
      * 实例Dialog
      */
     @Serializable
-    data object Sample
+    data object Sample:NavKey
 
     /**
      * 底部Dialog
      */
     @Serializable
-    data object Bottom
+    data object Bottom:NavKey
 
 }

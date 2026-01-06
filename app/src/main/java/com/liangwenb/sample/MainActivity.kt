@@ -106,6 +106,14 @@ fun Home() {
                 .fillMaxWidth()
                 .height(56.dp)
                 .wrapContentSize())
+        Text(
+            "底部弹窗", modifier = Modifier
+                .clickable {
+                    NavBackStackUtils.go(Dialog.Bottom)
+                }
+                .fillMaxWidth()
+                .height(56.dp)
+                .wrapContentSize())
     }
 }
 
