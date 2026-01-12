@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.rizzmeup.route_annotation.Route
+import com.liangwenb.nav.route.Route
 
 @Route(Page.Key::class)
 @Composable

@@ -38,8 +38,8 @@ import com.liangwenb.nav.KeyViewModel
 import com.liangwenb.nav.NavBackStackUtils
 import com.liangwenb.nav.ResultNavKey
 import com.liangwenb.sample.ui.theme.Nav3Theme
-import com.rizzmeup.route_annotation.NavType
-import com.rizzmeup.route_annotation.Route
+import com.liangwenb.nav.route.NavType
+import com.liangwenb.nav.route.Route
 import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {

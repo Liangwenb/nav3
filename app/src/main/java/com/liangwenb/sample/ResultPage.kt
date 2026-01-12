@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.rizzmeup.route_annotation.Route
+import com.liangwenb.nav.route.Route
 
 @Route(Page.Result::class)
 @Composable

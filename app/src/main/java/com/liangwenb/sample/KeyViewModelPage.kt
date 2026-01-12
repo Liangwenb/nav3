@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.liangwenb.nav.KeyViewModel
-import com.rizzmeup.route_annotation.Route
+import com.liangwenb.nav.route.Route
 
 @Route(Page.KeyViewModel::class)
 @Composable

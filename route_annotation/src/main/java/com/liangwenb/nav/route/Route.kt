@@ -1,4 +1,4 @@
-package com.rizzmeup.route_annotation
+package com.liangwenb.nav.route
 
 import androidx.navigation3.runtime.NavKey
 import kotlin.reflect.KClass

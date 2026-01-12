@@ -1,4 +1,4 @@
-package com.rizzmeup.processor
+package com.liangwenb.nav.processor
 
 import androidx.navigation3.runtime.NavKey
 import com.google.devtools.ksp.processing.Dependencies
@@ -11,8 +11,8 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.validate
-import com.rizzmeup.route_annotation.NavType
-import com.rizzmeup.route_annotation.Route
+import com.liangwenb.nav.route.NavType
+import com.liangwenb.nav.route.Route
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -43,15 +43,13 @@ class TestKspSymbolProcessor(private val environment: SymbolProcessorEnvironment
             val routeAnno = func.annotations.first { it.shortName.asString() == "Route" }
 
             val navTypeArg = routeAnno.arguments.first { it.name?.asString() == "type" }.value
-            val navType = NavType.valueOf(navTypeArg.toString().split(".")[1])
+            val navType = NavType.valueOf(navTypeArg.toString().split(".").last())
 
             environment.logger.warn("$navTypeArg")
 
             // 获取 key 的 KClass
             val keyArg = routeAnno.arguments.first { it.name?.asString() == "key" }.value as KSType
             val keyQualifiedName = keyArg.declaration.qualifiedName!!.asString()
-
-
 
             NavEntryData(
                 functionName = func.simpleName.asString(),
@@ -71,7 +69,12 @@ class TestKspSymbolProcessor(private val environment: SymbolProcessorEnvironment
 
     private fun generateEntryProvider(entries: List<NavEntryData>, resolver: Resolver) {
         val moduleName = environment.options["MODULE_NAME"] ?: "UnknownModule"
-        val currentPkg = resolver.getAllFiles()
+        
+        // Cache all files and functions once
+        val allFiles = resolver.getAllFiles().toList()
+        val allFunctions = allFiles.flatMap { it.declarations }.filterIsInstance<KSFunctionDeclaration>()
+        
+        val currentPkg = allFiles
             .map { it.packageName.asString() }
             .distinct()
             .maxByOrNull { it.length }
@@ -95,10 +98,8 @@ class TestKspSymbolProcessor(private val environment: SymbolProcessorEnvironment
             // 导入函数
             fileBuilder.addImport(entry.packageName, entry.functionName)
 
-            val funcDecl = resolver.getAllFiles()
-                .flatMap { it.declarations }
-                .filterIsInstance<KSFunctionDeclaration>()
-                .firstOrNull { it.simpleName.asString() == entry.functionName } ?: return@forEach
+            val funcDecl = allFunctions
+                .firstOrNull { it.simpleName.asString() == entry.functionName && it.packageName.asString() == entry.packageName } ?: return@forEach
 
             // 是否存在 KeyViewModel 需求
             val needsKey = funcDecl.parameters.any { param ->
@@ -109,7 +110,7 @@ class TestKspSymbolProcessor(private val environment: SymbolProcessorEnvironment
                 }
             }
 
-            // ✅ 是否存在 key 类型参数（新增）
+            // ✅ 是否存在 key 类型参数
             val hasKeyParam = funcDecl.parameters.any { param ->
                 param.type.resolve().declaration.qualifiedName?.asString() == entry.keyType
             }
@@ -132,7 +133,7 @@ class TestKspSymbolProcessor(private val environment: SymbolProcessorEnvironment
         fileBuilder.addFunction(funBuilder.build())
         val deps = Dependencies(
             aggregating = true,
-            sources = resolver.getAllFiles().toList().toTypedArray()
+            sources = allFiles.toTypedArray()
         )
         // 生成文件
         fileBuilder.build().writeTo(environment.codeGenerator, deps)
@@ -145,5 +146,3 @@ data class NavEntryData(
     val navType: NavType,
     val keyType: String
 )
-
-

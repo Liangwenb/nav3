@@ -49,8 +49,8 @@ fun isSerializable(navKey: Any): Boolean {
 
 object NavBackStackUtils {
 
-    lateinit var mianClass: Class<out Activity>
-    private val routerMap = LinkedHashMap<Context, NavBackStack<NavKey>>()
+    lateinit var mainClass: Class<out Activity>
+    private val routerMap = java.util.WeakHashMap<Context, NavBackStack<NavKey>>()
 
     fun attach(context: Context, navBackStack: NavBackStack<NavKey>) {
         if (routerMap[context] != navBackStack) {

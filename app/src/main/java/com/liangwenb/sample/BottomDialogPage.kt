@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.rizzmeup.route_annotation.NavType
-import com.rizzmeup.route_annotation.Route
+import com.liangwenb.nav.route.NavType
+import com.liangwenb.nav.route.Route
 
 @Route(Dialog.Bottom::class, NavType.BottomDialog)
 @Composable
