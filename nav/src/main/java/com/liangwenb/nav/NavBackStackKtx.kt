@@ -51,6 +51,7 @@ object NavBackStackUtils {
 
     lateinit var mainClass: Class<out Activity>
     private val routerMap = java.util.WeakHashMap<Context, NavBackStack<NavKey>>()
+    private val interceptors = mutableListOf<NavInterceptor>()
 
     fun attach(context: Context, navBackStack: NavBackStack<NavKey>) {
         if (routerMap[context] != navBackStack) {
@@ -62,13 +63,66 @@ object NavBackStackUtils {
         routerMap.remove(context)
     }
 
+    /**
+     * 添加导航拦截器
+     */
+    fun addInterceptor(interceptor: NavInterceptor) {
+        if (!interceptors.contains(interceptor)) {
+            interceptors.add(interceptor)
+        }
+    }
+
+    /**
+     * 移除导航拦截器
+     */
+    fun removeInterceptor(interceptor: NavInterceptor) {
+        interceptors.remove(interceptor)
+    }
+
+    /**
+     * 清空所有拦截器
+     */
+    fun clearInterceptors() {
+        interceptors.clear()
+    }
+
+    /**
+     * 处理拦截器链
+     * @return 处理后的 NavKey，如果返回 null 则取消导航
+     */
+    private fun processInterceptors(navKey: NavKey, action: NavAction): NavKey? {
+        var currentKey: NavKey? = navKey
+        
+        for (interceptor in interceptors) {
+            currentKey?.let {
+                when (val result = interceptor.intercept(it, action)) {
+                    is InterceptResult.Continue -> {
+                        // 继续使用当前的 navKey
+                    }
+                    is InterceptResult.Cancel -> {
+                        Log.d("NavBackStack", "导航被拦截取消: ${result.reason ?: "未提供原因"}")
+                        return null
+                    }
+                    is InterceptResult.Redirect -> {
+                        Log.d("NavBackStack", "导航被重定向: ${it::class.simpleName} -> ${result.newNavKey::class.simpleName}")
+                        currentKey = result.newNavKey
+                    }
+                }
+            } ?: return null
+        }
+        
+        return currentKey
+    }
+
     fun go(navKey: NavKey, context: Context? = null) {
+        val processedKey = processInterceptors(navKey, NavAction.GO) ?: return
+        
         val backStack = routerMap[context] ?: routerMap.values.lastOrNull()
         backStack?.let {
-            if (it.lastOrNull() == navKey) {
+            if (it.lastOrNull() == processedKey) {
                 Log.e("NavBackStack", "已经存在导航Key 界面 不能重复打开")
             } else {
-                it.go(navKey)
+                it.go(processedKey)
             }
 
         }
@@ -78,9 +132,11 @@ object NavBackStackUtils {
      * 打开新界面并关闭其他的所有界面
      */
     fun goOffAll(navKey: NavKey, context: Context? = null) {
+        val processedKey = processInterceptors(navKey, NavAction.GO_OFF_ALL) ?: return
+        
         val backStack = routerMap[context] ?: routerMap.values.lastOrNull()
-        go(navKey, context)
-        backStack?.removeIf { key -> key != navKey }
+        go(processedKey, context)
+        backStack?.removeIf { key -> key != processedKey }
 
     }
 
@@ -89,8 +145,17 @@ object NavBackStackUtils {
         context: Context? = null,
         onResult: (T?) -> Unit = {}
     ) {
-        navKey.resultCallback = onResult
-        go(navKey, context)
+        val processedKey = processInterceptors(navKey, NavAction.GO_RESULT) ?: return
+        
+        // 如果被重定向到非 ResultNavKey，则忽略回调
+        if (processedKey is ResultNavKey<*>) {
+            @Suppress("UNCHECKED_CAST")
+            (processedKey as ResultNavKey<T>).resultCallback = onResult
+        } else {
+            Log.w("NavBackStack", "导航被重定向到非 ResultNavKey，回调将被忽略")
+        }
+        
+        go(processedKey, context)
     }
 
     @OptIn(InternalCoroutinesApi::class)
@@ -98,15 +163,24 @@ object NavBackStackUtils {
         navKey: ResultNavKey<T>,
         context: Context? = null,
     ): T? {
+        val processedKey = processInterceptors(navKey, NavAction.GO_RESULT) ?: return null
+        
+        // 如果被重定向到非 ResultNavKey，返回 null
+        if (processedKey !is ResultNavKey<*>) {
+            Log.w("NavBackStack", "导航被重定向到非 ResultNavKey，返回 null")
+            return null
+        }
+        
         val cancellableCoroutine =
             suspendCancellableCoroutine { suspendCancellableCoroutine ->
-                navKey.resultCallback = {
+                @Suppress("UNCHECKED_CAST")
+                (processedKey as ResultNavKey<T>).resultCallback = {
                     val token = suspendCancellableCoroutine.tryResume(it)
                     if (token != null) {
                         suspendCancellableCoroutine.completeResume(token)
                     }
                 }
-                go(navKey, context)
+                go(processedKey, context)
             }
         return cancellableCoroutine
     }
