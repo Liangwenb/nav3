@@ -9,8 +9,8 @@
         arg("MODULE_NAME", project.name)
     }
     dependencies {
-        api("com.github.Liangwenb.nav3:nav:v1.0.3")
-        ksp("com.github.Liangwenb.nav3:route_processor:v1.0.3")
+        api("com.github.Liangwenb.nav3:nav:v1.1.0")
+        ksp("com.github.Liangwenb.nav3:route_processor:v1.1.0")
     }
 
 ### Activity
