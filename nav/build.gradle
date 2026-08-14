@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("maven-publish")
 }
@@ -18,10 +17,8 @@ afterEvaluate {
     }
 }
 android {
-    namespace 'com.liangwenb.nav'
-    compileSdk {
-        version = release(36)
-    }
+    namespace = 'com.liangwenb.nav'
+    compileSdk = 37
     publishing {
         singleVariant("release") {
             withSourcesJar()   // 可选：生成 sources.jar
@@ -29,27 +26,24 @@ android {
         }
     }
     defaultConfig {
-        minSdk 26
+        minSdk = 24
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = '11'
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
-        compose true
+        compose = true
     }
 }
 
@@ -68,6 +62,9 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
+    androidTestImplementation platform(libs.androidx.compose.bom)
+    androidTestImplementation libs.androidx.compose.ui.test.junit4
+    debugImplementation libs.androidx.compose.ui.test.manifest
     api project(':route_annotation')
     api libs.androidx.navigation3.runtime
     api libs.androidx.navigation3.ui

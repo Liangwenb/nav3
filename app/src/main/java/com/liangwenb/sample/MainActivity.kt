@@ -12,35 +12,26 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
-import com.liangwenb.app.generated.appInitEntryProvider
-import com.liangwenb.nav.KeyViewModel
 import com.liangwenb.nav.NavBackStackUtils
-import com.liangwenb.nav.ResultNavKey
-import com.liangwenb.sample.ui.theme.Nav3Theme
-import com.liangwenb.nav.route.NavType
+import com.liangwenb.nav.generated.appInitEntryProvider
+import com.liangwenb.nav.generated.appStringRouteResolver
 import com.liangwenb.nav.route.Route
-import kotlinx.serialization.Serializable
+import com.liangwenb.sample.ui.theme.Nav3Theme
 
 class MainActivity : ComponentActivity() {
 
@@ -51,70 +42,75 @@ class MainActivity : ComponentActivity() {
             Nav3Theme {
                 val backStack = rememberNavBackStack(Home)
                 val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
-                NavBackStackUtils.attach(this, backStack)
+                val stringRouteResolver = remember { appStringRouteResolver() }
+                DisposableEffect(backStack, stringRouteResolver) {
+                    NavBackStackUtils.attach(this@MainActivity, backStack, stringRouteResolver)
+                    onDispose { NavBackStackUtils.detach(this@MainActivity) }
+                }
                 NavDisplay(
                     backStack = backStack,
                     onBack = { backStack.removeLastOrNull() },
-                    sceneStrategy = dialogStrategy,
+                    sceneStrategies = listOf(dialogStrategy),
                     transitionSpec = {
                         slideInHorizontally(initialOffsetX = { it }) togetherWith
-                                slideOutHorizontally(targetOffsetX = { -it })
+                            slideOutHorizontally(targetOffsetX = { -it })
                     },
                     popTransitionSpec = {
                         slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                                slideOutHorizontally(targetOffsetX = { it })
+                            slideOutHorizontally(targetOffsetX = { it })
                     },
                     predictivePopTransitionSpec = {
                         slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                                slideOutHorizontally(targetOffsetX = { it })
+                            slideOutHorizontally(targetOffsetX = { it })
                     },
                     entryDecorators = listOf(
                         rememberSaveableStateHolderNavEntryDecorator(),
-                        rememberViewModelStoreNavEntryDecorator()
+                        rememberViewModelStoreNavEntryDecorator(),
                     ),
                     entryProvider = entryProvider {
-                        //将生成的路由方法放到这里
                         appInitEntryProvider()
-                    }
+                    },
                 )
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        NavBackStackUtils.detach(this)
-
-    }
 }
 
-
-@Route(Home::class)
+@Route(Home::class, route = "home")
 @Composable
 fun Home() {
     Column(
-        Modifier
+        modifier = Modifier
             .systemBarsPadding()
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
-
-        Text(
-            "跳转到把Key传递到Page中", modifier = Modifier
-                .clickable {
-                    NavBackStackUtils.go(Page.Key())
-                }
-                .fillMaxWidth()
-                .height(56.dp)
-                .wrapContentSize())
-        Text(
-            "底部弹窗", modifier = Modifier
-                .clickable {
-                    NavBackStackUtils.go(Dialog.Bottom)
-                }
-                .fillMaxWidth()
-                .height(56.dp)
-                .wrapContentSize())
+        HomeNavigationItem("Key 路由") {
+            NavBackStackUtils.go(Page.Key())
+        }
+        HomeNavigationItem("普通弹窗") {
+            NavBackStackUtils.go(Dialog.Sample)
+        }
+        HomeNavigationItem("字符串路由") {
+            NavBackStackUtils.go("page/字符串路由示例")
+        }
+        HomeNavigationItem("底部弹窗") {
+            NavBackStackUtils.go(Dialog.Bottom)
+        }
     }
 }
 
-
+@Composable
+private fun HomeNavigationItem(
+    label: String,
+    onClick: () -> Unit,
+) {
+    Text(
+        text = label,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .clickable(onClick = onClick)
+            .wrapContentSize(),
+    )
+}

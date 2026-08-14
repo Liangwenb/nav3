@@ -5,18 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
+open class KeyViewModel<T : NavKey>(val key: T) : ViewModel()
 
-
-open class KeyViewModel<T : NavKey>(val key: T) : ViewModel() {
-
-
-
-
-}
-
-
+@Suppress("UNCHECKED_CAST")
 @Composable
-public inline fun <reified K : NavKey, reified VM : KeyViewModel<K>> keyViewModel(key: NavKey): VM {
+inline fun <reified K : NavKey, reified VM : KeyViewModel<K>> keyViewModel(key: NavKey): VM {
     return viewModel(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             // 获取 VM 的 Class 对象

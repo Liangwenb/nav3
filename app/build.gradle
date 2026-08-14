@@ -1,47 +1,42 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.jetbrains.kotlin.serialization)
 }
-ksp {
-    arg("MODULE_NAME", project.name)
-}
 android {
-    namespace 'com.liangwenb.sample'
-    compileSdk 36
+    namespace = 'com.liangwenb.sample'
+    compileSdk = 37
 
     defaultConfig {
-        applicationId "com.liangwenb.sample"
-        minSdk 26
-        targetSdk 36
-        versionCode 1
-        versionName "1.0"
+        applicationId = "com.liangwenb.sample"
+        minSdk = 24
+        targetSdk = 37
+        versionCode = 1
+        versionName = "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled = true
+            shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = '17'
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
-        compose true
+        compose = true
     }
 }
 
 dependencies {
     implementation(project(":nav"))
+    implementation(project(":feature_sample"))
     ksp(project(':route_processor'))
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.runtime.ktx
